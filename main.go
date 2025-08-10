@@ -14,7 +14,7 @@ import (
 
 var clientID = os.Getenv("CLIENT_ID")
 var clientSecret = os.Getenv("CLIENT_SECRET")
-var redirectURI = "http://127.0.0.1:8081/spotify/auth/callback"
+var redirectURI = "https://prod.dkmondal.in/spotify/auth/callback"
 var stateKey = "spotify_auth_state"
 
 // TokenResponse represents the response from Spotify's token endpoint
