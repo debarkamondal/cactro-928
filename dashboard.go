@@ -15,7 +15,6 @@ func fetchTopSongs(w http.ResponseWriter, accessToken string) (*TopTracksRespons
 
 	// Set headers
 	req.Header.Set("Content-Type", "application/json")
-	// auth := base64.StdEncoding.EncodeToString([]byte(clientID + ":" + clientSecret))
 	req.Header.Set("Authorization", "Bearer "+accessToken)
 
 	// Make request
@@ -31,6 +30,31 @@ func fetchTopSongs(w http.ResponseWriter, accessToken string) (*TopTracksRespons
 	json.NewDecoder(resp.Body).Decode(&response)
 	return &response, nil
 }
+func currentlyPlaying(w http.ResponseWriter, accessToken string) (*CurrentlyPlaying, error) {
+
+	req, err := http.NewRequest("GET", "https://api.spotify.com/v1/me/player/currently-playing", nil)
+	if err != nil {
+		http.Error(w, "Error creating request", http.StatusInternalServerError)
+		return nil, err
+	}
+
+	// Set headers
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+accessToken)
+
+	// Make request
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		http.Error(w, "Error making request", http.StatusInternalServerError)
+		return nil, err
+	}
+	defer resp.Body.Close()
+	var response CurrentlyPlaying
+	json.NewDecoder(resp.Body).Decode(&response)
+	return &response, nil
+}
+
 func fetchArtists(w http.ResponseWriter, accessToken string) (*FollowedArtistsResponse, error) {
 
 	req, err := http.NewRequest("GET", "https://api.spotify.com/v1/me/following?type=artist", nil)
@@ -41,7 +65,6 @@ func fetchArtists(w http.ResponseWriter, accessToken string) (*FollowedArtistsRe
 
 	// Set headers
 	req.Header.Set("Content-Type", "application/json")
-	// auth := base64.StdEncoding.EncodeToString([]byte(clientID + ":" + clientSecret))
 	req.Header.Set("Authorization", "Bearer "+accessToken)
 
 	// Make request
@@ -64,6 +87,7 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	playing, err := currentlyPlaying(w, accessToken.Value)
 	tracks, err := fetchTopSongs(w, accessToken.Value)
 	artists, err := fetchArtists(w, accessToken.Value)
 	if err != nil {
@@ -72,14 +96,16 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(body)
 		return
 	}
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
 
 	var resp struct {
 		Tracks  TopTracksResponse       `json:"tracks"`
 		Artists FollowedArtistsResponse `json:"artists"`
+		Playing CurrentlyPlaying        `json:"playing"`
 	}
 	resp.Tracks = *tracks
 	resp.Artists = *artists
+	resp.Playing = *playing
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp)
 }

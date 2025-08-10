@@ -48,7 +48,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	params := url.Values{}
 	params.Add("response_type", "code")
 	params.Add("client_id", clientID)
-	params.Add("scope", "user-read-private user-top-read user-follow-read user-read-email")
+	params.Add("scope", "user-read-private user-modify-playback-state user-read-currently-playing user-top-read user-follow-read user-read-email")
 	params.Add("redirect_uri", redirectURI)
 	params.Add("state", state)
 
@@ -218,6 +218,10 @@ func main() {
 	mux.HandleFunc("/login", loginHandler)
 	mux.HandleFunc("/auth/callback", callbackHandler)
 	mux.HandleFunc("/auth/refresh_token", refreshTokenHandler)
+
+	mux.HandleFunc("/play", PlayHandler)
+	mux.HandleFunc("/pause", PauseHandler)
+
 	fmt.Println("Listening on port 8081 (proxied)")
 	if err := http.ListenAndServe(":8081", root); err != nil {
 		fmt.Println(err)
