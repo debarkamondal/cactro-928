@@ -1,0 +1,10 @@
+[build]
+cmd = "CGO_ENABLED=0 go build -o bin/spotify"
+bin = "bin/spotify"
+dir = "./src"
+include_ext = ["go"]
+run_after_build = "chmod +x spotify"
+
+[log]
+leve = "debug"
+

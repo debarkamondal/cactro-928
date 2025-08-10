@@ -1,0 +1,23 @@
+services:
+  spotify:
+    image: spotify
+    build:
+      context: .
+      target: dev
+      platforms:
+        - linux/arm64
+        - linux/amd64
+    container_name: spotify
+    env_file:
+      - ./.env
+    networks:
+      - spotify-network
+    volumes:
+      - ./public/:/public
+      - .:/app
+    ports:
+      - 8081:8081
+
+networks:
+  spotify-network:
+
