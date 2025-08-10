@@ -11,7 +11,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/debarkamondal/cactro-928/middlewares"
 )
 
 var clientID = os.Getenv("CLIENT_ID")
@@ -225,7 +224,7 @@ func main() {
 	mux.HandleFunc("/pause", PauseHandler)
 
 	fmt.Println("Listening on port 8081 (proxied)")
-	if err := http.ListenAndServe(":8081", middlewares.CORS(root)); err != nil {
+	if err := http.ListenAndServe(":8081", root); err != nil {
 		fmt.Println(err)
 		fmt.Println("Couldn't initiate server on port 8081")
 	}
