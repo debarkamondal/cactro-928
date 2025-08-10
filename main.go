@@ -11,7 +11,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/aws/smithy-go/middleware"
 	"github.com/debarkamondal/cactro-928/middlewares"
 )
 
